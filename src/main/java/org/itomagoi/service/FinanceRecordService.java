@@ -31,28 +31,32 @@ public class FinanceRecordService {
 
     }
 
+    public void updateBalance(){
+
+            financeRecordDao.updateBalance();
+
+    }
+
+    public double getTotalBalance(){
+
+        return financeRecordDao.getTotalBalance();
+    }
+
+    public double getExpenseAmount(){
+
+        return financeRecordDao.getExpense();
+    }
+
+    public double getIncomeAmount(){
+
+        return financeRecordDao.getIncomes();
+    }
+
     public FinanceRecordDto findFilteredRecords(FinanceRecordType filterType){
 
         List<FinanceRecord> records = financeRecordDao.findAllRecords(filterType);
 
         return new FinanceRecordDto(records);
-    }
-
-    public double calculateIncome(){
-
-        return financeRecordDao.findAllRecords(FinanceRecordType.INCOME).
-                stream()
-                .map(FinanceRecord::getAmount)
-                .reduce(0.0,Double::sum);
-    }
-
-    public double calculateExpense(){
-
-        return financeRecordDao.findAllRecords(FinanceRecordType.EXPENSE).
-                stream()
-                .map(FinanceRecord::getAmount)
-                .reduce(0.0,Double::sum);
-
     }
 
     public void saveRecord(FinanceRecord record){
@@ -63,6 +67,7 @@ public class FinanceRecordService {
     public void deleteTransaction(int id) {
 
         financeRecordDao.deleteTransaction(id);
+        this.updateBalance();
     }
 
 }

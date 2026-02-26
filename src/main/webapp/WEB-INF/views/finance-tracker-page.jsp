@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -151,18 +152,28 @@
                     <i class='bx bx-plus icon'></i>
                 </div>
                 <ul class="todo-list">
-                    <li class="completed">
-                        <p>Emergency Fund ($5k / $5k)</p>
-                        <i class='bx bx-check-circle' ></i>
-                    </li>
-                    <li class="not-completed">
-                        <p>New Laptop ($800 / $2k)</p>
-                        <i class='bx bx-dots-vertical-rounded' ></i>
-                    </li>
-                    <li class="not-completed">
-                        <p>Vacation ($300 / $1k)</p>
-                        <i class='bx bx-dots-vertical-rounded' ></i>
-                    </li>
+
+                    <c:choose>
+                    <c:when test="${not empty goalRecord}">
+                    <c:forEach items="${goalRecord}" var="record">
+                        <li class= "${record.currentMoney / record.goalMoney >= 1 ? 'completed' : 'not-completed'}">
+                            <p>
+                                    ${record.title} (
+                                $${record.currentMoney < 1000 ? record.currentMoney : ''}<c:if test="${record.currentMoney >= 1000}"><fmt:formatNumber value="${record.currentMoney / 1000}" maxFractionDigits="1"/>k</c:if>
+                                /
+                                $${record.goalMoney < 1000 ? record.goalMoney : ''}<c:if test="${record.goalMoney >= 1000}"><fmt:formatNumber value="${record.goalMoney / 1000}" maxFractionDigits="1"/>k</c:if>
+                                )
+                            </p>
+                            <i class='bx bx-check-circle' ></i>
+                        </li>
+                        </c:forEach>
+                    </c:when>
+                    <c:otherwise>
+                    <p>
+                        There are no goals
+                    </p>
+                </c:otherwise>
+                    </c:choose>
                 </ul>
             </div>
         </div>
@@ -191,9 +202,9 @@
             </div>
 
             <div class="input-group">
-                <label for="category">Category</label>
+                <label for="title">Category</label>
 
-                <input type="text" id="category" name="category" placeholder="e.g., Groceries, Salary" required>
+                <input type="text" id="title" name="title" placeholder="e.g., Groceries, Salary" required>
             </div>
 
             <div class="input-group">
@@ -210,6 +221,19 @@
         </form>
     </div>
 </div>
+<script>
+
+    function floorNumber(num){
+
+        return Math.floor(num);
+    }
+
+
+
+
+</script>
+
+
 <script src="${pageContext.request.contextPath}/WEB-INF/script/script.js"></script>
 </body>
 </html>

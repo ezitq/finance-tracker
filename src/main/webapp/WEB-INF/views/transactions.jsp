@@ -102,7 +102,7 @@
                 <table>
                     <thead>
                     <tr>
-                        <th>Category</th>
+                        <th>Title</th>
                         <th>Type</th>
                         <th>Date</th>
                         <th>Amount</th>
@@ -115,6 +115,9 @@
                     <c:when test="${not empty financeRecords}">
 
                     <c:forEach items="${financeRecords}" var="record">
+
+
+
                         <tr>
                             <td>
                                 <div class="icon-box food"><i class='bx bx-restaurant'></i></div>
@@ -125,8 +128,24 @@
                             <td><span class="${record.type == "INCOME" ? "status income" : "status expense"} ">
                                     ${record.type == "INCOME" ? "" : "-"}$${record.amount}</span></td>
                             <td>
-                                <button class="action-btn edit"><i class='bx bx-edit'></i></button>
+                        <c:choose>
 
+                                <c:when test="${record.type != 'GOAL'}">
+
+                                    <button class="action-btn edit"
+                                            data-id="${record.id}"
+                                            data-type="${record.type}"
+                                            data-title="${record.title}"
+                                            data-amount="${record.amount}"
+                                            data-date="${record.date}"
+                                            onclick="openEditModal(this)">
+                                        <i class='bx bx-edit'></i>
+                                    </button>
+
+                                </c:when>
+
+
+                        </c:choose>
                                 <form action="/delete-transaction" method="post">
 
                                     <input type="hidden" name="id" value="${record.id}">
@@ -146,6 +165,8 @@
                             </td>
 
                         </tr>
+
+
 
                     </c:otherwise>
                     </c:choose>
@@ -168,6 +189,7 @@
         <h2>New Transaction</h2>
 
         <form action="${pageContext.request.contextPath}/save-transaction" method="POST">
+            <input type="hidden" id="recordId" name="id" value="">
             <div class="input-group">
                 <label for="type">Operation Type</label>
                 <select name="type" id="type">
@@ -177,8 +199,8 @@
             </div>
 
             <div class="input-group">
-                <label for="category">Category</label>
-                <input type="text" id="category" name="category" placeholder="e.g., Groceries, Salary" required>
+                <label for="title">Title</label>
+                <input type="text" id="title" name="title" placeholder="e.g., Groceries, Salary" required>
             </div>
 
             <div class="input-group">
@@ -195,6 +217,40 @@
         </form>
     </div>
 </div>
-<script src="${pageContext.request.contextPath}/WEB-INF/script/script.js"></script>
+
+
+
+
+<script>
+    function openEditModal(btn) {
+        const form = document.querySelector('#transactionModal form');
+
+        // Switch form to update mode
+        form.action = '/update-transaction';
+        document.getElementById('recordId').value = btn.dataset.id;
+
+        // Pre-fill the fields
+        document.getElementById('type').value        = btn.dataset.type;
+        document.getElementById('title').value    = btn.dataset.title;
+        document.getElementById('amount').value      = btn.dataset.amount;
+        document.getElementById('date').value        = btn.dataset.date;
+
+        // Update modal title
+        document.querySelector('#transactionModal h2').textContent = 'Edit Transaction';
+
+        // Open the modal
+        window.location.hash = 'transactionModal';
+    }
+
+    document.querySelector('a[href="#transactionModal"]').addEventListener('click', () => {
+        const form = document.querySelector('#transactionModal form');
+        form.action = '/save-transaction';
+        form.reset();
+        document.getElementById('recordId').value = '';
+        document.querySelector('#transactionModal h2').textContent = 'New Transaction';
+    });
+
+
+</script>
 </body>
 </html>

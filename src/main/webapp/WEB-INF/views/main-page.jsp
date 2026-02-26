@@ -10,7 +10,7 @@
 <div class="login-container">
     <div class="login-card">
         <div class="login-header">
-            <div class="logo-icon">⚡</div>
+
             <h2>Sign In</h2>
             <p>Access your account</p>
         </div>
@@ -59,19 +59,9 @@
             <span>or</span>
         </div>
 
-        <div class="social-login">
-            <button type="button" class="social-btn google-btn">
-                <span class="social-icon google-icon"></span>
-                <span>Continue with Google</span>
-            </button>
-            <button type="button" class="social-btn apple-btn">
-                <span class="social-icon apple-icon"></span>
-                <span>Continue with Apple</span>
-            </button>
-        </div>
 
         <div class="signup-link">
-            <p>New here? <a href="#">Create an account</a></p>
+            <p>New here? <a  href="${pageContext.request.contextPath}/show-registration-page">Create an account</a></p>
         </div>
 
         <div class="success-message" id="successMessage">

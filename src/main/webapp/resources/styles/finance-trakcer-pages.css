@@ -37,6 +37,77 @@ li { list-style: none; }
     --orange: var(--neon-pink);
 }
 
+/* Контейнер для позиціонування */
+.menu-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+/* Прибираємо стандартні стилі кнопки */
+.menu-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 24px;
+    color: #666;
+    padding: 0;
+}
+
+/* Стиль самого вікна меню */
+.menu-dropdown {
+    display: none; /* Сховано за замовчуванням */
+    position: absolute;
+    right: 0;
+    top: 30px;
+    background-color: white;
+    min-width: 150px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-radius: 8px;
+    z-index: 100;
+    overflow: hidden;
+    border: 1px solid #eee;
+}
+
+/* Показуємо меню при додаванні класу */
+.menu-dropdown.show {
+    display: block;
+}
+
+/* Елементи меню */
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 15px;
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.2s;
+}
+
+.menu-item:hover {
+    background-color: #f5f5f5;
+}
+
+.menu-item i {
+    font-size: 18px;
+}
+
+/* Червоний колір для видалення */
+.delete-btn {
+    color: #e74c3c;
+}
+
+.delete-btn:hover {
+    background-color: #fff5f5;
+}
+
+
 html { overflow-x: hidden; }
 body {
     background: var(--grey);
@@ -270,6 +341,47 @@ body {
 .goal-status { font-size: 12px; color: var(--text-muted); }
 .goal-status.status-done { color: #00ff88; }
 
+.title-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
+.quick-delete-btn {
+    background: var(--surface);
+    border-radius: 0.5em;
+    box-shadow: inset 0 0 5px rgba(221, 10, 10, 0.2), 0 0 10px rgba(221, 10, 10, 0.2);
+    border: solid 2px #610101;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 0.7em 1.7em;
+    outline: none;
+    transition: all 0.3s;
+    user-select: none;
+    font-family: var(--poppins);
+    color: #ae2525;
+    font-weight: 500;
+    margin: auto;
+    transition: all 0.3s;
+    width: fit-content;
+}
+
+.quick-delete-btn:hover .text {
+    transform: scale(0.9);
+}
+
+.quick-delete-btn:active .text {
+    transform: scale(0.8);
+}
+
+
+.quick-delete-btn:hover {
+ background:crimson; color: #000000; box-shadow: 0 0 15px crimson; }
+
+
+
+
 /* Action Buttons in Table */
 .action-btn {
     background: none;
@@ -324,6 +436,7 @@ body {
     background: var(--bg-dark);
     border-radius: 10px;
     color: var(--text-muted);
+    font-size: 24px;
     font-size: 24px;
 }
 
