@@ -4,6 +4,7 @@ import org.itomagoi.dao.FinanceRecordDao;
 import org.itomagoi.dto.FinanceRecordDto;
 import org.itomagoi.entity.FinanceRecord;
 import org.itomagoi.entity.FinanceRecordType;
+import org.itomagoi.entity.GoalRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +34,7 @@ public class FinanceRecordService {
 
     public void updateBalance(){
 
-            financeRecordDao.updateBalance();
+        financeRecordDao.updateBalance();
 
     }
 

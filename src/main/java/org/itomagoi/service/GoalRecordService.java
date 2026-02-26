@@ -33,6 +33,25 @@ public class GoalRecordService {
                 .findFirst().get();
     }
 
+    public void reduceBalance(GoalRecord goalRecord, double amountToReduce){
+
+        double currentMoney = goalRecord.getCurrentMoney();
+
+        goalRecord.setCurrentMoney(currentMoney - amountToReduce);
+    }
+
+    public GoalRecord findGoalRecordByTitle(String title){
+
+        return findAllRecords()
+                .getRecords()
+                .stream()
+                .filter(gr -> gr.getTitle().equals(title))
+                .findFirst()
+                .orElse(null);
+
+    }
+
+
     public GoalRecordDto findAllRecords() {
 
         List<GoalRecord> goalRecords = goalRecordDao.findAllRecords();
