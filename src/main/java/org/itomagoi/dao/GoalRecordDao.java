@@ -28,7 +28,7 @@ public class GoalRecordDao {
 
     public void saveRecord(GoalRecord record){
 
-        goalRecords.add(record);
+        goalRecords.add(0, record);
 
     }
 }
