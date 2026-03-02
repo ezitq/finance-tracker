@@ -7,6 +7,7 @@ import org.itomagoi.entity.FinanceRecordType;
 import org.itomagoi.entity.GoalRecord;
 import org.itomagoi.entity.FinanceRecord;
 import org.itomagoi.service.AuthorizationService;
+import org.itomagoi.service.ChartService;
 import org.itomagoi.service.FinanceRecordService;
 import org.itomagoi.service.GoalRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +67,7 @@ public class CommonController {
 
        FinanceRecordDto recordsToAnalyze = recordService.findAllRecords();
 
-        Map<String, Double> expensesFromDb = getStringDoubleMap(recordsToAnalyze);
+        Map<String, Double> expensesFromDb = ChartService.getStringDoubleMap(recordsToAnalyze);
 
         // 2. Перетворюємо це у формат, який любить CanvasJS (список мап з ключами "label" та "y")
         List<Map<String, Object>> dataPoints = new ArrayList<>();
@@ -83,26 +84,7 @@ public class CommonController {
         return "analytics";
     }
 
-    @NonNull
-    private static Map<String, Double> getStringDoubleMap(FinanceRecordDto recordsToAnalyze) {
-        List <FinanceRecord> financeRecordList = recordsToAnalyze.getRecords();
 
-// 1. Уявімо, що це ваші реальні витрати з бази даних
-        Map<String, Double> expensesFromDb = new HashMap<>();
-
-        for(FinanceRecord record : financeRecordList){
-
-            if(record.getType() == FinanceRecordType.GOAL
-                    || record.getType() == FinanceRecordType.EXPENSE){
-                expensesFromDb.put(record.getTitle(), record.getAmount() * - 1);
-
-            }else {
-                expensesFromDb.put(record.getTitle(), record.getAmount());
-
-            }
-        }
-        return expensesFromDb;
-    }
 
     @RequestMapping("/goals-page")
     public String showGoalsPage(HttpSession session, Model model) {
@@ -187,14 +169,10 @@ public class CommonController {
 
         FinanceRecord financeRecord = recordService.findRecordById(id);
 
-            GoalRecord goalRecord = goalRecordService.findAllRecords()
-                    .getRecords()
-                    .stream()
-                    .filter(gr -> gr.getTitle().equals(financeRecord.getTitle()))
-                    .findFirst()
-                    .get();
-
-            goalRecord.setCurrentMoney(goalRecord.getCurrentMoney() - financeRecord.getAmount());
+        if(financeRecord.getType().equals(FinanceRecordType.GOAL)){
+            GoalRecord goalRecord = goalRecordService.findGoalRecordByTitle(financeRecord.getTitle());
+            goalRecordService.reduceBalance(goalRecord, financeRecord.getAmount());
+        }
 
         recordService.deleteTransaction(id);
 

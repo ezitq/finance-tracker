@@ -53,9 +53,7 @@ public class FinanceRecordDao {
 
         this.totalBalance = expense + incomes;
 
-
     }
-
 
     public void deleteTransaction(int id) {
         // Це скаже списку: "Пройдися по всіх елементах і видали той, у якого id збігається"

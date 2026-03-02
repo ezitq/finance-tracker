@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+a { text-decoration: none; }
+li { list-style: none; }
+
+:root {
+    --poppins: 'Poppins', sans-serif;
+    --lato: 'Lato', sans-serif;
+
+    /* NEON THEME VARIABLES */
+    --bg-dark: #070709;
+    --surface: #131318;
+    --surface-hover: #1e1e26;
+
+    --neon-cyan: #00f3ff;
+    --neon-green: #00ff66;
+    --neon-pink: #ff0055;
+    --neon-purple: #bc13fe;
+
+    --text-light: #ffffff;
+    --text-muted: #888899;
+
+    /* Aliases */
+    --light: var(--surface);
+    --grey: var(--bg-dark);
+    --dark: var(--text-light);
+    --dark-grey: var(--text-muted);
+    --blue: var(--neon-cyan);
+    --red: var(--neon-pink);
+    --yellow: var(--neon-purple);
+    --orange: var(--neon-pink);
+}
+
+html { overflow-x: hidden; }
+
+body {
+    background: var(--grey);
+    color: var(--text-light);
+    overflow-x: hidden;
+}

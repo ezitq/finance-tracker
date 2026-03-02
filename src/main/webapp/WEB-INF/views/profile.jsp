@@ -5,7 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/styles/finance-trakcer-pages.css">
+    <link rel="stylesheet" href="/resources/styles/profile.css">
+    <link rel="stylesheet" href="/resources/styles/base.css">
+    <link rel="stylesheet" href="/resources/styles/sidebar.css">
+    <link rel="stylesheet" href="/resources/styles/layout.css">
+    <link rel="stylesheet" href="/resources/styles/dashboard.css">
+    <link rel="stylesheet" href="/resources/styles/modal.css">
     <title>Neon Finance Tracker</title>
 </head>
 <body>
