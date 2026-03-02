@@ -15,10 +15,16 @@
             <p>Create your account</p>
         </div>
 
-        <form action="#" class="login-form" id="loginForm" novalidate>
+        <form action="${pageContext.request.contextPath}/register" class="login-form" id="loginForm" novalidate>
+            <c:if test ="${not empty error}">
+                <p style="color:red">
+                    <c:out value="${error}" />
+                </p>
+            </c:if>
+
             <div class="form-group">
                 <div class="input-wrapper">
-                    <input type="text" id="email" name="email" required onkeyup="validEmail()">
+                    <input type="text" id="email" value="${typedEmail}" name="email" required onkeyup="validEmail()">
                     <label for="email">Email</label>
                     <span class="input-line"></span>
                 </div>

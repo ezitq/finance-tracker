@@ -15,7 +15,7 @@
             <p>Access your account</p>
         </div>
 
-        <form action="${pageContext.request.contextPath}/home-page" class="login-form" id="loginForm" novalidate>
+        <form action="${pageContext.request.contextPath}/login" class="login-form" id="loginForm" novalidate>
             <div class="form-group">
                 <div class="input-wrapper">
                     <input type="email" id="email" name="email" required>
@@ -58,7 +58,6 @@
         <div class="divider">
             <span>or</span>
         </div>
-
 
         <div class="signup-link">
             <p>New here? <a  href="${pageContext.request.contextPath}/show-registration-page">Create an account</a></p>

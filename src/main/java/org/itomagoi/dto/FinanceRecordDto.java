@@ -17,11 +17,5 @@ public class FinanceRecordDto {
         return records;
     }
 
-    public double getTotalBalance() {
-        return totalBalance;
-    }
 
-    public void setTotalBalance(double totalBalance) {
-        this.totalBalance = totalBalance;
-    }
 }
