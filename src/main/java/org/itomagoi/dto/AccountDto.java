@@ -1,11 +1,9 @@
 package org.itomagoi.dto;
 
 import org.itomagoi.entity.AccountRecord;
-
 import java.util.List;
 
 public class AccountDto {
-
     private final List<AccountRecord> accounts;
 
     public AccountDto(List<AccountRecord> accounts) {
@@ -15,5 +13,4 @@ public class AccountDto {
     public List<AccountRecord> getAccounts() {
         return accounts;
     }
-
 }

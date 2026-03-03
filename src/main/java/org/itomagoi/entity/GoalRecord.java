@@ -2,6 +2,7 @@ package org.itomagoi.entity;
 
 public class GoalRecord {
 
+    private AccountRecord accountRecord;
     private static int incrementId = 0;
     private final int id;
     private String title;
@@ -9,37 +10,28 @@ public class GoalRecord {
     private double goalMoney;
 
     public GoalRecord(String title, double currentMoney, double goalMoney) {
-        id = incrementId++;
+        this.id = incrementId++;
         this.title = title;
         this.currentMoney = currentMoney;
         this.goalMoney = goalMoney;
     }
 
-    public int getId() {
-        return id;
-    }
+    public AccountRecord getAccountRecord() { return accountRecord; }
+    public void setAccountRecord(AccountRecord accountRecord) { this.accountRecord = accountRecord; }
 
-    public String getTitle() {
-        return title;
-    }
+    public int getId() { return id; }
 
-    public double getCurrentMoney() {
-        return currentMoney;
-    }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
 
-    public double getGoalMoney() {
-        return goalMoney;
-    }
+    public double getCurrentMoney() { return currentMoney; }
+    public void setCurrentMoney(double currentMoney) { this.currentMoney = currentMoney; }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+    public double getGoalMoney() { return goalMoney; }
+    public void setGoalMoney(double goalMoney) { this.goalMoney = goalMoney; }
 
-    public void setCurrentMoney(double currentMoney) {
-        this.currentMoney = currentMoney;
-    }
-
-    public void setGoalMoney(double goalMoney) {
-        this.goalMoney = goalMoney;
+    public double getProgress() {
+        if (goalMoney <= 0) return 0;
+        return Math.min((currentMoney / goalMoney) * 100, 100);
     }
 }
