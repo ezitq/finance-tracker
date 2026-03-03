@@ -1,18 +1,16 @@
 package org.itomagoi.controller;
 
 import org.itomagoi.dto.FinanceRecordDto;
-import org.itomagoi.dto.GoalRecordDto;
 import org.itomagoi.entity.AccountRecord;
-import org.itomagoi.entity.FinanceRecordType;
-import org.itomagoi.entity.GoalRecord;
+import org.itomagoi.entity.ConvertCurrency;
 import org.itomagoi.entity.FinanceRecord;
+import org.itomagoi.entity.GoalRecord;
 import org.itomagoi.service.AuthorizationService;
 import org.itomagoi.service.ChartService;
 import org.itomagoi.service.FinanceRecordService;
 import org.itomagoi.service.GoalRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -20,277 +18,273 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpSession;
 import java.time.LocalDate;
-import java.util.*;
 
 @Controller
 public class CommonController {
 
-    private FinanceRecordService recordService;
-    private GoalRecordService goalRecordService;
-    private AuthorizationService authorizationService;
+    private final FinanceRecordService recordService;
+    private final GoalRecordService goalRecordService;
+    private final AuthorizationService authorizationService;
 
     @Autowired
-    public CommonController(FinanceRecordService recordService, GoalRecordService goalRecordService,
+    public CommonController(FinanceRecordService recordService,
+                            GoalRecordService goalRecordService,
                             AuthorizationService authorizationService) {
-        this.goalRecordService = goalRecordService;
         this.recordService = recordService;
+        this.goalRecordService = goalRecordService;
         this.authorizationService = authorizationService;
     }
 
-    @RequestMapping("/")
-    public String showMainPage(Model model) {
+    private AccountRecord getAuthUser(HttpSession session) {
+        return (AccountRecord) session.getAttribute("currentUser");
+    }
 
+    private String redirectIfNotAuth(HttpSession session) {
+        return getAuthUser(session) == null ? "redirect:/" : null;
+    }
+
+    @GetMapping("/")
+    public String showMainPage(HttpSession session) {
+        if (getAuthUser(session) != null) return "redirect:/home-page";
         return "main-page";
     }
 
-    @RequestMapping("/transaction-page")
-    public String showTransactionPage(Model model) {
-
-        FinanceRecordDto financeRecordDto = recordService.findAllRecords();
-
-        List<FinanceRecord> financeRecordList =  financeRecordDto.getRecords();
-
-        model.addAttribute("financeRecords", financeRecordList);
-
-        return "transactions";
-    }
-
-    @RequestMapping("/profile-page")
-    public String shoProfilePage(HttpSession session, Model model) {
-
-        return "profile";
-    }
-
-
-    @RequestMapping("/analytics-page")
-    public String showAnalyticsPage(HttpSession session, Model model) {
-
-       FinanceRecordDto recordsToAnalyze = recordService.findAllRecords();
-
-        Map<String, Double> expensesFromDb = ChartService.getStringDoubleMap(recordsToAnalyze);
-
-        // 2. Перетворюємо це у формат, який любить CanvasJS (список мап з ключами "label" та "y")
-        List<Map<String, Object>> dataPoints = new ArrayList<>();
-
-        for (Map.Entry<String, Double> entry : expensesFromDb.entrySet()) {
-            Map<String, Object> point = new HashMap<>();
-            point.put("label", entry.getKey());
-            point.put("y", entry.getValue());
-            dataPoints.add(point);
-        }
-
-        // 3. Відправляємо на сторінку
-        model.addAttribute("dataPointsList", dataPoints);
-        return "analytics";
-    }
-
-
-
-    @RequestMapping("/goals-page")
-    public String showGoalsPage(HttpSession session, Model model) {
-
-        GoalRecordDto goalRecordDto = goalRecordService.findAllRecords();
-
-        model.addAttribute("totalBalance", recordService.getTotalBalance());
-        model.addAttribute( "goalRecords", goalRecordDto.getRecords());
-        model.addAttribute("recordService", goalRecordService);
-
-        return "goals";
-    }
-
-    @RequestMapping("/home-page")
+    @GetMapping("/home-page")
     public String showHomePage(HttpSession session, Model model) {
+        AccountRecord user = getAuthUser(session);
+        if (user == null) return "redirect:/";
 
-        FinanceRecordDto financeRecordDto = recordService.findAllRecords();
-        GoalRecordDto goalRecordDto = goalRecordService.findAllRecords();
-
-        double incomeAmount = recordService.getIncomeAmount();
-        double expenseAmount = recordService.getExpenseAmount();
-        double totalBalance = recordService.getTotalBalance();
-
-        model.addAttribute("financeRecords", financeRecordDto.getRecords());
-        model.addAttribute("incomeAmount", incomeAmount);
-        model.addAttribute("expenseAmount", expenseAmount);
-        model.addAttribute("totalBalance", totalBalance);
-        model.addAttribute("goalRecord" , goalRecordDto.getRecords());
-
-
+        model.addAttribute("financeRecords", recordService.findAllRecordsByUser(user).getRecords());
+        model.addAttribute("incomeAmount", recordService.getIncomeAmountByUser(user));
+        model.addAttribute("expenseAmount", recordService.getExpenseAmountByUser(user));
+        model.addAttribute("totalBalance", recordService.getTotalBalanceByUser(user));
+        model.addAttribute("goalRecords", goalRecordService.findAllRecordsByUser(user).getRecords());
+        model.addAttribute("user", user);
         return "finance-tracker-page";
     }
 
-    @RequestMapping(value = "/save-transaction", method = RequestMethod.POST)
-    public String saveTransaction(
-            HttpSession session,
-            @RequestHeader(value = "Referer", required = false) String referer,
-            @RequestParam String title,
-            @RequestParam double amount,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
-            @RequestParam String type) {
+    @GetMapping("/transaction-page")
+    public String showTransactionPage(HttpSession session, Model model) {
+        AccountRecord user = getAuthUser(session);
+        if (user == null) return "redirect:/";
 
-        FinanceRecord financeRecord = new FinanceRecord(title, type, date, amount);
-        // ... збереження в БД ...
-        System.out.println("Збережено: " + financeRecord);
-        recordService.saveRecord(financeRecord);
-
-        System.out.println(referer);
-
-        return "redirect:" + referer;
+        model.addAttribute("financeRecords", recordService.findAllRecordsByUser(user).getRecords());
+        model.addAttribute("user", user);
+        return "transactions";
     }
 
-    @RequestMapping(value = "/save-goal", method = RequestMethod.POST)
-    public String saveFinanceGoal(
-            HttpSession session,
-            @RequestParam String category,
-            @RequestParam double amount) {
+    @GetMapping("/goals-page")
+    public String showGoalsPage(HttpSession session, Model model) {
+        AccountRecord user = getAuthUser(session);
+        if (user == null) return "redirect:/";
 
-        GoalRecord goalRecord = new GoalRecord(category,0.0 ,amount);
-
-        goalRecordService.saveGoal(goalRecord);
-
-        return "redirect:goals-page";
+        model.addAttribute("goalRecords", goalRecordService.findAllRecordsByUser(user).getRecords());
+        model.addAttribute("totalBalance", recordService.getTotalBalanceByUser(user));
+        model.addAttribute("user", user);
+        return "goals";
     }
 
-    @RequestMapping(value = "/delete-goal", method = RequestMethod.POST)
-    public String deleteGoalRecord(
-            HttpSession session,
-            @RequestParam int id){
-
-        goalRecordService.deleteGoal(id);
-
-        return "redirect:/goals-page";
-
-    }
-
-
-    @RequestMapping(value = "/delete-transaction", method = RequestMethod.POST)
-    public String deleteTransaction(
-            HttpSession session,
-            @RequestParam int id) {
-
-        FinanceRecord financeRecord = recordService.findRecordById(id);
-
-        if(financeRecord.getType().equals(FinanceRecordType.GOAL)){
-            GoalRecord goalRecord = goalRecordService.findGoalRecordByTitle(financeRecord.getTitle());
-            goalRecordService.reduceBalance(goalRecord, financeRecord.getAmount());
-        }
-
-        recordService.deleteTransaction(id);
-
-        return "redirect:/transaction-page";
-    }
-
-
-    @RequestMapping(value = "show-registration-page", method = RequestMethod.GET)
-    public String showRegistrationPage(
-            @RequestParam(value = "email", required = false) String email,
-            @RequestParam(value = "password", required = false) String password){
-
+    @GetMapping("/show-registration-page")
+    public String showRegistrationPage(HttpSession session) {
+        if (getAuthUser(session) != null) return "redirect:/home-page";
         return "registration-page";
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public String login(
-            @RequestParam String email,
-            @RequestParam String password,
-            HttpSession httpSession){
+    @GetMapping("/analytics-page")
+    public String showAnalyticsPage(HttpSession session, Model model) {
+        AccountRecord user = getAuthUser(session);
+        if (user == null) return "redirect:/";
 
-        AccountRecord user = authorizationService.validateUser(email,password);
+        FinanceRecordDto dto = recordService.findAllRecordsByUser(user);
+        model.addAttribute("dataPointsList", ChartService.getStringDoubleMap(dto));
+        model.addAttribute("user", user);
+        return "analytics";
+    }
 
-        if (user != null)  {
-            httpSession.setAttribute("currentUser", user);
-            return "finance-tracker-page";
+    @GetMapping("/profile-page")
+    public String showProfilePage(HttpSession session, Model model) {
+        AccountRecord user = getAuthUser(session);
+        if (user == null) return "redirect:/";
 
+        model.addAttribute("user", user);
+        model.addAttribute("currencies", ConvertCurrency.values());
+        return "profile";
+    }
+
+    @PostMapping("/login")
+    public String login(@RequestParam String email, @RequestParam String password,
+                        HttpSession session, RedirectAttributes redirectAttributes) {
+        AccountRecord user = authorizationService.validateUser(email, password);
+        if (user != null) {
+            session.setAttribute("currentUser", user);
+            return "redirect:/home-page";
+        }
+        redirectAttributes.addFlashAttribute("loginError", "Невірний email або пароль");
+        return "redirect:/";
+    }
+
+    @PostMapping("/register")
+    public String register(@RequestParam String email, @RequestParam String password,
+                           HttpSession session, RedirectAttributes redirectAttributes) {
+        boolean success = authorizationService.registerAccount(email, password);
+        if (!success) {
+            redirectAttributes.addFlashAttribute("registerError", "Акаунт вже існує або дані некоректні");
+            return "redirect:/";
+        }
+        AccountRecord user = authorizationService.validateUser(email, password);
+        session.setAttribute("currentUser", user);
+        return "redirect:/home-page";
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        session.invalidate();
+        return "redirect:/";
+    }
+
+    @PostMapping("/save-transaction")
+    public String saveTransaction(HttpSession session,
+                                  @RequestParam String title,
+                                  @RequestParam double amount,
+                                  @RequestParam String type,
+                                  @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
+                                  @RequestHeader(value = "Referer", required = false) String referer) {
+        AccountRecord user = getAuthUser(session);
+        if (user == null) return "redirect:/";
+
+        FinanceRecord record = new FinanceRecord(title, type, date, amount);
+        record.setAccountRecord(user);
+        recordService.saveRecord(record);
+
+        return "redirect:" + (referer != null ? referer : "/home-page");
+    }
+
+    @PostMapping("/delete-transaction")
+    public String deleteTransaction(HttpSession session, @RequestParam int id,
+                                    @RequestHeader(value = "Referer", required = false) String referer) {
+        AccountRecord user = getAuthUser(session);
+        if (user == null) return "redirect:/";
+
+        FinanceRecord record = recordService.findById(id);
+        if (record != null && record.getAccountRecord().getEmail().equals(user.getEmail())) {
+            recordService.deleteRecord(id);
         }
 
-        return "main-page";
-
+        return "redirect:" + (referer != null ? referer : "/home-page");
     }
 
-    @RequestMapping(value = "/register", method = RequestMethod.GET)
-    public String register(
-            @RequestParam String email,
-            @RequestParam String password,
-            @RequestParam String confirmPassword,
-            Model model) {
+    @PostMapping("/edit-transaction")
+    public String editTransaction(HttpSession session,
+                                  @RequestParam int id,
+                                  @RequestParam String title,
+                                  @RequestParam double amount,
+                                  @RequestParam String type,
+                                  @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
+                                  @RequestHeader(value = "Referer", required = false) String referer) {
+        AccountRecord user = getAuthUser(session);
+        if (user == null) return "redirect:/";
 
-        model.addAttribute("typedEmail", email);
-        if(!authorizationService.validateEmail(email)){
-
-            model.addAttribute("error", "Емейлн не валідний!");
-            return "registration-page";
+        FinanceRecord record = recordService.findById(id);
+        if (record != null && record.getAccountRecord().getEmail().equals(user.getEmail())) {
+            record.setTitle(title);
+            record.setAmount(amount);
+            record.setType(org.itomagoi.entity.FinanceRecordType.valueOf(type));
+            record.setDate(date);
         }
 
-        if (!authorizationService.validatePassword(password)) {
+        return "redirect:" + (referer != null ? referer : "/home-page");
+    }
 
-            model.addAttribute("error", "Пароль слабкий. Введіть мінімально "
-                    + authorizationService.getMIN_PASS_LENGTH() + " cимволів!");
-            return "registration-page";
+    @PostMapping("/save-goal")
+    public String saveGoal(HttpSession session,
+                           @RequestParam String title,
+                           @RequestParam double currentMoney,
+                           @RequestParam double goalMoney,
+                           @RequestHeader(value = "Referer", required = false) String referer) {
+        AccountRecord user = getAuthUser(session);
+        if (user == null) return "redirect:/";
 
+        GoalRecord goal = new GoalRecord(title, currentMoney, goalMoney);
+        goal.setAccountRecord(user);
+        goalRecordService.saveGoal(goal);
+
+        return "redirect:" + (referer != null ? referer : "/home-page");
+    }
+
+    @PostMapping("/delete-goal")
+    public String deleteGoal(HttpSession session, @RequestParam int id,
+                             @RequestHeader(value = "Referer", required = false) String referer) {
+        AccountRecord user = getAuthUser(session);
+        if (user == null) return "redirect:/";
+
+        GoalRecord goal = goalRecordService.findById(id);
+        if (goal != null && goal.getAccountRecord().getEmail().equals(user.getEmail())) {
+            goalRecordService.deleteGoal(id);
         }
 
-        if (!password.equals(confirmPassword)) {
+        return "redirect:" + (referer != null ? referer : "/home-page");
+    }
 
-            model.addAttribute("error", "Паролі не збігаються");
-            return "registration-page";
+    @PostMapping("/add-funds-to-goal")
+    public String addFundsToGoal(HttpSession session, @RequestParam int id, @RequestParam double amount,
+                                 @RequestHeader(value = "Referer", required = false) String referer) {
+        AccountRecord user = getAuthUser(session);
+        if (user == null) return "redirect:/";
 
+        GoalRecord goal = goalRecordService.findById(id);
+        if (goal != null && goal.getAccountRecord().getEmail().equals(user.getEmail())) {
+            goalRecordService.addFunds(id, amount);
         }
 
-        authorizationService.saveAccount(email, password);
-            return "main-page";
+        return "redirect:" + (referer != null ? referer : "/home-page");
     }
 
+    @PostMapping("/update-profile")
+    public String updateProfile(HttpSession session,
+                                @RequestParam(required = false) String name,
+                                @RequestParam(required = false) String secondName,
+                                @RequestParam(required = false) String currency,
+                                RedirectAttributes redirectAttributes) {
+        AccountRecord user = getAuthUser(session);
+        if (user == null) return "redirect:/";
 
-    @RequestMapping(value = "/update-transaction", method = RequestMethod.POST)
-    public String updateTransaction(HttpSession session,
-                                    @RequestParam int id,
-                                    @RequestParam int amount,
-                                    @RequestParam String title,
-                                    @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
-                                    @RequestParam String type){
+        if (name != null && !name.isBlank()) authorizationService.updateName(user, name);
+        if (secondName != null && !secondName.isBlank()) authorizationService.updateSecondName(user, secondName);
+        if (currency != null && !currency.isBlank()) {
+            try {
+                authorizationService.updateCurrency(user, ConvertCurrency.valueOf(currency));
+            } catch (IllegalArgumentException ignored) {}
+        }
 
-        FinanceRecord financeRecord = recordService.findRecordById(id);
-
-        financeRecord.setAmount(amount);
-        financeRecord.setDate(date);
-        financeRecord.setTitle(title);
-        financeRecord.setType(FinanceRecordType.valueOf(type));
-
-        recordService.updateBalance();
-
-        return "redirect:/transaction-page";
+        redirectAttributes.addFlashAttribute("profileSuccess", "Профіль оновлено");
+        return "redirect:/profile-page";
     }
 
-    @RequestMapping(value = "/add-funds", method = RequestMethod.POST)
-    public String addFunds(HttpSession session,
-                           @RequestParam int id,
-                           @RequestParam double amountToAdd) {
+    @PostMapping("/update-password")
+    public String updatePassword(HttpSession session,
+                                 @RequestParam String oldPassword,
+                                 @RequestParam String newPassword,
+                                 RedirectAttributes redirectAttributes) {
+        AccountRecord user = getAuthUser(session);
+        if (user == null) return "redirect:/";
 
-        goalRecordService.addFunds(id, amountToAdd);
+        boolean success = authorizationService.updatePassword(user, oldPassword, newPassword);
+        if (!success) {
+            redirectAttributes.addFlashAttribute("passwordError", "Невірний поточний пароль або новий пароль занадто короткий");
+        } else {
+            redirectAttributes.addFlashAttribute("passwordSuccess", "Пароль змінено");
+        }
 
-        GoalRecord goalRecord = goalRecordService.findGoalRecordById(id);
-
-        FinanceRecord financeRecord = new FinanceRecord(goalRecord.getTitle(), FinanceRecordType.GOAL,LocalDate.now(),amountToAdd);
-
-        recordService.saveRecord(financeRecord);
-
-        return "redirect:/goals-page";
+        return "redirect:/profile-page";
     }
 
+    @PostMapping("/delete-account")
+    public String deleteAccount(HttpSession session) {
+        AccountRecord user = getAuthUser(session);
+        if (user == null) return "redirect:/";
 
-    @RequestMapping(value = "/valid-reg", method = RequestMethod.GET)
-    public String registerUser(@ModelAttribute AccountRecord user, RedirectAttributes redirectAttributes) {
-        // Якщо сталася помилка:
-        redirectAttributes.addFlashAttribute("user", user); // Передаємо весь об'єкт
-        redirectAttributes.addFlashAttribute("errorMessage", "Паролі не збігаються");
-
-        return "redirect:/show-registration-page";
+        authorizationService.deleteAccount(user);
+        session.invalidate();
+        return "redirect:/";
     }
-
-
-    @RequestMapping(value = "/force-add-funds", method = RequestMethod.POST)
-    public String forceAddFunds(@RequestParam int id, @RequestParam double amount) {
-        goalRecordService.addFunds(id, amount); // Додаємо без перевірок
-        return "redirect:/goals-page";
-    }
-
 }

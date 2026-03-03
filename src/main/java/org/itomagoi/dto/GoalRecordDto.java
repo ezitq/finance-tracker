@@ -1,8 +1,6 @@
 package org.itomagoi.dto;
 
-import org.itomagoi.entity.FinanceRecord;
 import org.itomagoi.entity.GoalRecord;
-
 import java.util.List;
 
 public class GoalRecordDto {
@@ -10,11 +8,9 @@ public class GoalRecordDto {
 
     public GoalRecordDto(List<GoalRecord> goalRecords) {
         this.goalRecords = goalRecords;
-
     }
 
     public List<GoalRecord> getRecords() {
-        return  goalRecords;
+        return goalRecords;
     }
-
 }

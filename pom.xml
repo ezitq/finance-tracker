@@ -21,6 +21,36 @@
         <version>5.3.29</version>
       </dependency>
 
+
+    <!-- PostgreSQL Driver -->
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.7.3</version>
+    </dependency>
+
+    <!-- Spring JDBC -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+      <version>6.1.0</version>
+    </dependency>
+
+    <!-- Або Spring Data JPA (якщо використовуєш JPA) -->
+    <dependency>
+      <groupId>org.springframework.data</groupId>
+      <artifactId>spring-data-jpa</artifactId>
+      <version>3.2.0</version>
+    </dependency>
+
+    <!-- Hibernate (для JPA) -->
+    <dependency>
+      <groupId>org.hibernate.orm</groupId>
+      <artifactId>hibernate-core</artifactId>
+      <version>6.4.0.Final</version>
+    </dependency>
+
+
       <!-- https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api -->
       <dependency>
         <groupId>javax.servlet</groupId>
@@ -38,5 +68,15 @@
   </dependencies>
   <build>
     <finalName>FitnessTracker</finalName>
+      <plugins>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <configuration>
+                  <source>11</source>
+                  <target>11</target>
+              </configuration>
+          </plugin>
+      </plugins>
   </build>
 </project>
