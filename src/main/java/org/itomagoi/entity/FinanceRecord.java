@@ -1,22 +1,37 @@
 package org.itomagoi.entity;
 
 import org.springframework.format.annotation.DateTimeFormat;
+
+import javax.persistence.*;
 import java.time.LocalDate;
 
+@Entity
+@Table(name = "transactions")
 public class FinanceRecord {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private AccountRecord accountRecord;
-    private static int incrementId = 0;
-    private final int id;
+
+    @Column(name = "title")
     private String title;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type")
     private FinanceRecordType type;
 
+    @Column(name = "transaction_date")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
+
+    @Column(name = "amount")
     private double amount;
 
     public FinanceRecord(String title, String type, LocalDate date, double amount) {
-        this.id = incrementId++;
         this.title = title;
         this.type = FinanceRecordType.valueOf(type);
         this.date = date;
@@ -24,11 +39,14 @@ public class FinanceRecord {
     }
 
     public FinanceRecord(String title, FinanceRecordType type, LocalDate date, double amount) {
-        this.id = incrementId++;
         this.title = title;
         this.type = type;
         this.date = date;
         this.amount = amount;
+    }
+
+    public FinanceRecord() {
+
     }
 
     public AccountRecord getAccountRecord() { return accountRecord; }

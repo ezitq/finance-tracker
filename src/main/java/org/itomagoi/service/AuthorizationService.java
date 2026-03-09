@@ -6,10 +6,16 @@ import org.itomagoi.entity.ConvertCurrency;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
 public class AuthorizationService {
+
+    @PersistenceContext
+    private EntityManager em;
 
     private final AccountDao accountDao;
     private static final int MIN_PASS_LENGTH = 8;
@@ -41,6 +47,7 @@ public class AuthorizationService {
         return null;
     }
 
+    @Transactional
     public boolean registerAccount(String email, String password) {
         if (!validateEmail(email) || !validatePassword(password)) return false;
         return accountDao.saveAccount(email, password);
