@@ -2,55 +2,51 @@ package org.itomagoi.dao;
 
 import org.itomagoi.entity.AccountRecord;
 import org.itomagoi.entity.FinanceRecord;
-import org.itomagoi.entity.FinanceRecordType;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Repository
 public class FinanceRecordDao {
 
-    private final List<FinanceRecord> records = new ArrayList<>();
+    @PersistenceContext
+    private EntityManager em;
 
     public List<FinanceRecord> findAllRecords() {
-        return new ArrayList<>(records);
+        // Запит на отримання всіх записів, сортування за ID (останні зверху)
+        return em.createQuery("SELECT f FROM FinanceRecord f ORDER BY f.id DESC", FinanceRecord.class)
+                .getResultList();
     }
 
     public List<FinanceRecord> findByAccountRecord(AccountRecord user) {
-        if (user == null) return new ArrayList<>();
-        return records.stream()
-                .filter(r -> r.getAccountRecord() != null && r.getAccountRecord().getEmail().equals(user.getEmail()))
-                .collect(Collectors.toList());
+        if (user == null) return List.of();
+        // Використовуємо JPQL для фільтрації за об'єктом AccountRecord
+        return em.createQuery("SELECT f FROM FinanceRecord f WHERE f.accountRecord = :user", FinanceRecord.class)
+                .setParameter("user", user)
+                .getResultList();
     }
 
-    public double getIncomesByUser(AccountRecord user) {
-        return findByAccountRecord(user).stream()
-                .filter(r -> r.getType() == FinanceRecordType.INCOME)
-                .mapToDouble(FinanceRecord::getAmount)
-                .sum();
-    }
-
-    public double getExpensesByUser(AccountRecord user) {
-        return findByAccountRecord(user).stream()
-                .filter(r -> r.getType() == FinanceRecordType.EXPENSE || r.getType() == FinanceRecordType.GOAL)
-                .mapToDouble(FinanceRecord::getAmount)
-                .sum();
-    }
-
+    @Transactional
     public void saveRecord(FinanceRecord record) {
-        records.add(0, record);
+        if (record.getId() == 0) {
+            em.persist(record); // Створити новий запис
+        } else {
+            em.merge(record);   // Оновити існуючий
+        }
     }
 
+    @Transactional
     public void deleteRecord(int id) {
-        records.removeIf(r -> r.getId() == id);
+        FinanceRecord record = findById(id);
+        if (record != null) {
+            em.remove(record);
+        }
     }
 
     public FinanceRecord findById(int id) {
-        return records.stream()
-                .filter(r -> r.getId() == id)
-                .findFirst()
-                .orElse(null);
+        return em.find(FinanceRecord.class, id);
     }
 }

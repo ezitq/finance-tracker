@@ -3,39 +3,48 @@ package org.itomagoi.dao;
 import org.itomagoi.entity.AccountRecord;
 import org.itomagoi.entity.GoalRecord;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Repository
 public class GoalRecordDao {
 
-    private final List<GoalRecord> goalRecords = new ArrayList<>();
+    @PersistenceContext
+    private EntityManager em;
 
     public List<GoalRecord> findAllRecords() {
-        return new ArrayList<>(goalRecords);
+        return em.createQuery("SELECT g FROM GoalRecord g ORDER BY g.id DESC", GoalRecord.class)
+                .getResultList();
     }
 
     public List<GoalRecord> findByAccountRecord(AccountRecord user) {
-        if (user == null) return new ArrayList<>();
-        return goalRecords.stream()
-                .filter(g -> g.getAccountRecord() != null && g.getAccountRecord().getEmail().equals(user.getEmail()))
-                .collect(Collectors.toList());
+        if (user == null) return List.of();
+        return em.createQuery("SELECT g FROM GoalRecord g WHERE g.accountRecord = :user", GoalRecord.class)
+                .setParameter("user", user)
+                .getResultList();
     }
 
+    @Transactional
     public void saveRecord(GoalRecord record) {
-        goalRecords.add(0, record);
+        if (record.getId() == 0) {
+            em.persist(record);
+        } else {
+            em.merge(record);
+        }
     }
 
+    @Transactional
     public void deleteRecord(int id) {
-        goalRecords.removeIf(g -> g.getId() == id);
+        GoalRecord record = findById(id);
+        if (record != null) {
+            em.remove(record);
+        }
     }
 
     public GoalRecord findById(int id) {
-        return goalRecords.stream()
-                .filter(g -> g.getId() == id)
-                .findFirst()
-                .orElse(null);
+        return em.find(GoalRecord.class, id);
     }
 }

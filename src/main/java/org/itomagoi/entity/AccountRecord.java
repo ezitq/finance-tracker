@@ -1,29 +1,55 @@
 package org.itomagoi.entity;
 
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "users")
 public class AccountRecord {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private int id;
+
+    @Column(name = "name")
     private String name;
+
+    @Column(name = "second_name")
     private String secondName;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "currency")
     private ConvertCurrency currency = ConvertCurrency.USD;
+
+    @Column(name = "email", unique = true)
     private String email;
+
+    @Column(name = "password")
     private String password;
+
+    @Column(name = "registration_date")
     private LocalDate registrationDate;
-    private List<FinanceRecord> transactionsList;
-    private List<GoalRecord> goalsList;
-    private String image;
+
+    @OneToMany(mappedBy = "accountRecord", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FinanceRecord> transactionsList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "accountRecord", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<GoalRecord> goalsList = new ArrayList<>();
+
+    public AccountRecord() {
+    }
 
     public AccountRecord(String email, String password) {
         this.email = email;
         this.password = password;
         this.registrationDate = LocalDate.now();
-        this.transactionsList = new ArrayList<>();
-        this.goalsList = new ArrayList<>();
-        this.image = null;
     }
+
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -49,6 +75,15 @@ public class AccountRecord {
     public List<GoalRecord> getGoalsList() { return goalsList; }
     public void setGoalsList(List<GoalRecord> goalsList) { this.goalsList = goalsList; }
 
-    public String getImage() { return image; }
-    public void setImage(String image) { this.image = image; }
+    @Override
+    public String toString() {
+        return "AccountRecord{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", secondName='" + secondName + '\'' +
+                ", currency=" + currency +
+                ", email='" + email + '\'' +
+                ", registrationDate=" + registrationDate +
+                '}';
+    }
 }
