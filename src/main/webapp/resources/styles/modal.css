@@ -72,6 +72,9 @@
     cursor: pointer;
     transition: 0.3s;
     text-decoration: none;
+    /* Bigger tap target on mobile */
+    padding: 4px 8px;
+    line-height: 1;
 }
 
 .close-btn:hover {
@@ -100,6 +103,8 @@
     outline: none;
     font-family: var(--poppins);
     transition: 0.3s;
+    /* Prevent iOS zoom on focus (font-size must be ≥ 16px) */
+    font-size: 16px;
 }
 
 .input-group input:focus,
@@ -120,10 +125,60 @@
     font-weight: 600;
     cursor: pointer;
     transition: 0.3s;
+    touch-action: manipulation;
 }
 
 .submit-btn:hover {
     background: var(--neon-cyan);
     color: #000;
     box-shadow: 0 0 15px var(--neon-cyan);
+}
+
+/* ==========================================
+   RESPONSIVE BREAKPOINTS
+   ========================================== */
+
+@media screen and (max-width: 480px) {
+    /* Modal slides up from bottom on phones — feels more native */
+    .modal {
+        align-items: flex-end;
+    }
+
+    .modal-content {
+        max-width: 100%;
+        width: 100%;
+        border-radius: 20px 20px 0 0;
+        padding: 24px 20px 32px; /* extra bottom padding for safe area */
+        transform: translateY(100%); /* slide from bottom */
+
+        /* Safe area support for notched phones */
+        padding-bottom: max(32px, env(safe-area-inset-bottom));
+    }
+
+    .modal:target .modal-content {
+        transform: translateY(0);
+    }
+
+    /* Drag handle indicator */
+    .modal-content::before {
+        content: '';
+        display: block;
+        width: 40px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 2px;
+        margin: 0 auto 20px;
+    }
+
+    .modal-content h2 {
+        font-size: 18px;
+        margin-bottom: 16px;
+    }
+
+    .input-group { margin-bottom: 12px; }
+
+    .submit-btn {
+        padding: 14px;
+        font-size: 17px;
+    }
 }

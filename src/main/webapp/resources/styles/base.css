@@ -37,10 +37,31 @@ li { list-style: none; }
     --orange: var(--neon-pink);
 }
 
-html { overflow-x: hidden; }
+html {
+    overflow-x: hidden;
+    /* Smooth scrolling for the whole app */
+    scroll-behavior: smooth;
+}
 
 body {
     background: var(--grey);
     color: var(--text-light);
     overflow-x: hidden;
+    /* Prevent content shift when scrollbar appears/disappears */
+    scrollbar-gutter: stable;
+}
+
+/* ==========================================
+   MOBILE VIEWPORT FIX
+   Add this meta tag to your HTML <head>:
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+   The viewport-fit=cover is required for safe-area-inset support (notched iPhones).
+   ========================================== */
+
+/* Prevent long words/URLs from breaking layout on small screens */
+* { word-break: break-word; }
+
+/* Improve tap target accessibility */
+button, a, [role="button"] {
+    -webkit-tap-highlight-color: transparent;
 }

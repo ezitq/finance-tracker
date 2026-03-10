@@ -14,6 +14,8 @@
     margin-bottom: 15px;
     border: 3px solid var(--neon-cyan);
     box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+    max-width: 100%;
+    height: auto;
 }
 
 .profile-card { text-align: center; }
@@ -28,6 +30,7 @@
     border-radius: 5px;
     cursor: pointer;
     transition: 0.3s;
+    touch-action: manipulation;
 }
 
 .btn-outline:hover {
@@ -36,3 +39,55 @@
 }
 
 .profile-settings { /* inherits .order styles from dashboard.css */ }
+
+/* ==========================================
+   RESPONSIVE BREAKPOINTS
+   ========================================== */
+
+@media screen and (max-width: 768px) {
+    .profile-container {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .profile-card {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        text-align: left;
+        background: var(--surface);
+        padding: 20px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
+        flex-shrink: 0;
+        margin-bottom: 0;
+    }
+
+    .profile-card h3 { font-size: 18px; }
+    .profile-card p  { margin-bottom: 12px; font-size: 13px; }
+}
+
+@media screen and (max-width: 480px) {
+    .profile-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 16px;
+    }
+
+    .profile-avatar {
+        width: 90px;
+        height: 90px;
+        margin-bottom: 10px;
+    }
+
+    .btn-outline {
+        width: 100%;
+        padding: 10px 16px;
+        font-size: 15px;
+    }
+}
