@@ -18,6 +18,132 @@ class LoginForm2 {
         this.init();
     }
 
+    /**
+     * sidebar-toggle.js
+     * Drop-in script for the mobile-responsive sidebar.
+     * Works alongside the updated sidebar.css and layout.css.
+     *
+     * USAGE — add at the bottom of your <body>:
+     *   <script src="sidebar-toggle.js"></script>
+     *
+     * REQUIRED HTML structure (already in your project):
+     *   <section id="sidebar"> ... </section>
+     *   <div id="sidebar-overlay"></div>   ← ADD THIS after #sidebar
+     *   <section id="content">
+     *     <nav>
+     *       <i class="bx bx-menu" id="menu-toggle"></i>
+     *       ...
+     *     </nav>
+     *   </section>
+     */
+
+function () {
+        const sidebar  = document.getElementById('sidebar');
+        const overlay  = document.getElementById('sidebar-overlay');
+        const menuBtn  = document.querySelector('#content nav .bx.bx-menu');
+
+        if (!sidebar || !menuBtn) return; // guard: elements must exist
+
+        // --------------------------------------------------
+        // Helpers
+        // --------------------------------------------------
+        function isMobile() {
+            return window.innerWidth <= 480;
+        }
+
+        function isTablet() {
+            return window.innerWidth > 480 && window.innerWidth <= 768;
+        }
+
+        function openSidebar() {
+            if (isMobile() || isTablet()) {
+                // Mobile / tablet: use overlay pattern
+                sidebar.classList.add('mobile-open');
+                if (overlay) overlay.style.display = 'block';
+                // Allow transition to kick in
+                requestAnimationFrame(() => {
+                    if (overlay) overlay.style.opacity = '1';
+                });
+                document.body.style.overflow = 'hidden'; // prevent body scroll
+            } else {
+                // Desktop: toggle the icon-only "hide" class
+                sidebar.classList.toggle('hide');
+            }
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('mobile-open');
+            if (overlay) {
+                overlay.style.opacity = '0';
+                // Wait for the CSS transition to finish before hiding
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 300);
+            }
+            document.body.style.overflow = '';
+        }
+
+        // --------------------------------------------------
+        // Event listeners
+        // --------------------------------------------------
+
+        // Hamburger / menu button
+        menuBtn.addEventListener('click', function () {
+            if (isMobile() || isTablet()) {
+                if (sidebar.classList.contains('mobile-open')) {
+                    closeSidebar();
+                } else {
+                    openSidebar();
+                }
+            } else {
+                sidebar.classList.toggle('hide');
+            }
+        });
+
+        // Overlay click → close
+        if (overlay) {
+            overlay.addEventListener('click', closeSidebar);
+        }
+
+        // Close sidebar when a nav link is tapped on mobile
+        sidebar.querySelectorAll('.side-menu li a').forEach(function (link) {
+            link.addEventListener('click', function () {
+                if (isMobile() || isTablet()) {
+                    closeSidebar();
+                }
+            });
+        });
+
+        // On resize: clean up state so desktop/mobile don't conflict
+        window.addEventListener('resize', function () {
+            if (window.innerWidth > 768) {
+                // Back to desktop — remove mobile state
+                sidebar.classList.remove('mobile-open');
+                if (overlay) {
+                    overlay.style.display = 'none';
+                    overlay.style.opacity = '0';
+                }
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Swipe-to-close on mobile (touch events)
+        let touchStartX = 0;
+
+        sidebar.addEventListener('touchstart', function (e) {
+            touchStartX = e.touches[0].clientX;
+        }, { passive: true });
+
+        sidebar.addEventListener('touchend', function (e) {
+            const deltaX = e.changedTouches[0].clientX - touchStartX;
+            // Swipe left ≥ 60px → close
+            if (deltaX < -60 && isMobile()) {
+                closeSidebar();
+            }
+        }, { passive: true });
+    }
+
+
     init() {
         this.addEventListeners();
         this.setupFloatingLabels();

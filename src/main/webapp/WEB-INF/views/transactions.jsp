@@ -1,5 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,13 +8,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="/resources/styles/base.css">
+    <link rel="stylesheet" href="/resources/styles/main.css">
     <link rel="stylesheet" href="/resources/styles/sidebar.css">
     <link rel="stylesheet" href="/resources/styles/layout.css">
     <link rel="stylesheet" href="/resources/styles/dashboard.css">
     <link rel="stylesheet" href="/resources/styles/modal.css">
     <title>Neon Finance Tracker</title>
 </head>
-<body>
+<body data-currency="${not empty user.currency ? user.currency : 'USD'}">
+<c:set var="currencySymbol"><c:choose><c:when test="${user.currency.name() == 'USD'}">$</c:when><c:when test="${user.currency.name() == 'EUR'}">€</c:when><c:when test="${user.currency.name() == 'UAH'}">₴</c:when><c:otherwise>${not empty user.currency.name() ? user.currency.name() : '$'}</c:otherwise></c:choose></c:set>
 <section id="sidebar">
     <a href="/home-page" class="brand">
         <i class='bx bx-wallet-alt bx-sm'></i>
@@ -60,10 +63,10 @@
         </li>
     </ul>
 </section>
-
+<div id="sidebar-overlay"></div>
 <section id="content">
     <nav>
-        <i class='bx bx-menu bx-sm'></i>
+        <i class='bx bx-menu bx-sm' id='menu-toggle'></i>
         <form action="#">
             <div class="form-input">
                 <input type="search" placeholder="Search transactions...">
@@ -123,7 +126,7 @@
                                     <td>${record.date}</td>
                                     <td>
                                         <span class="${record.type == 'INCOME' ? 'status income' : 'status expense'}">
-                                            ${record.type == 'INCOME' ? '+' : '-'}$<fmt:formatNumber value="${record.amount}" maxFractionDigits="2"/>
+                                            ${record.type == 'INCOME' ? '+' : '-'}${currencySymbol}<fmt:formatNumber value="${record.amount}" maxFractionDigits="2"/>
                                         </span>
                                     </td>
                                     <td>
@@ -176,7 +179,7 @@
                 <input type="text" id="title" name="title" placeholder="e.g., Groceries, Salary" required>
             </div>
             <div class="input-group">
-                <label for="amount">Amount ($)</label>
+                <label for="amount">Amount (${currencySymbol})</label>
                 <input type="number" id="amount" name="amount" step="0.01" placeholder="0.00" required>
             </div>
             <div class="input-group">
@@ -208,6 +211,61 @@
         document.getElementById('transactionForm').reset();
         document.getElementById('recordId').value = '';
     });
+</script>
+
+</html>
+<script>
+(function () {
+    var sidebar = document.getElementById("sidebar");
+    var overlay = document.getElementById("sidebar-overlay");
+    var menuBtn = document.getElementById("menu-toggle");
+    if (!sidebar || !menuBtn) return;
+
+    function isMobile()  { return window.innerWidth <= 480; }
+    function isTablet()  { return window.innerWidth > 480 && window.innerWidth <= 768; }
+
+    function openSidebar() {
+        sidebar.classList.add("mobile-open");
+        overlay.style.cssText = "display:block;opacity:1;";
+        document.body.style.overflow = "hidden";
+    }
+    function closeSidebar() {
+        sidebar.classList.remove("mobile-open");
+        overlay.style.opacity = "0";
+        setTimeout(function(){ overlay.style.display = "none"; }, 300);
+        document.body.style.overflow = "";
+    }
+
+    menuBtn.addEventListener("click", function () {
+        if (isMobile() || isTablet()) {
+            sidebar.classList.contains("mobile-open") ? closeSidebar() : openSidebar();
+        } else {
+            sidebar.classList.toggle("hide");
+        }
+    });
+
+    overlay.addEventListener("click", closeSidebar);
+
+    sidebar.querySelectorAll(".side-menu li a").forEach(function (link) {
+        link.addEventListener("click", function () {
+            if (isMobile() || isTablet()) closeSidebar();
+        });
+    });
+
+    window.addEventListener("resize", function () {
+        if (window.innerWidth > 768) {
+            sidebar.classList.remove("mobile-open");
+            overlay.style.cssText = "display:none;opacity:0;";
+            document.body.style.overflow = "";
+        }
+    });
+
+    var touchStartX = 0;
+    sidebar.addEventListener("touchstart", function (e) { touchStartX = e.touches[0].clientX; }, { passive: true });
+    sidebar.addEventListener("touchend", function (e) {
+        if (e.changedTouches[0].clientX - touchStartX < -60 && isMobile()) closeSidebar();
+    }, { passive: true });
+})();
 </script>
 </body>
 </html>

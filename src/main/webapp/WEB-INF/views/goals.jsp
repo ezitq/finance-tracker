@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -25,7 +26,9 @@
         .goal-header h3 { margin: 0; }
     </style>
 </head>
-<body>
+<body data-currency="${not empty user.currency ? user.currency : 'USD'}">
+<c:set var="currencySymbol"><c:choose><c:when test="${user.currency.name() == 'USD'}">$</c:when><c:when test="${user.currency.name() == 'EUR'}">€</c:when><c:when test="${user.currency.name() == 'UAH'}">₴</c:when><c:otherwise>${not empty user.currency.name() ? user.currency.name() : '$'}</c:otherwise></c:choose></c:set>
+
 <section id="sidebar">
     <a href="/home-page" class="brand">
         <i class='bx bx-wallet-alt bx-sm'></i>
@@ -42,10 +45,10 @@
         <li><a href="/logout" class="logout"><i class='bx bx-power-off bx-sm'></i><span class="text">Logout</span></a></li>
     </ul>
 </section>
-
+<div id="sidebar-overlay"></div>
 <section id="content">
     <nav>
-        <i class='bx bx-menu bx-sm'></i>
+        <i class='bx bx-menu bx-sm' id='menu-toggle'></i>
         <form action="#">
             <div class="form-input">
                 <input type="search" placeholder="Search...">
@@ -101,8 +104,8 @@
                             </div>
 
                             <p class="goal-amount">
-                                $<fmt:formatNumber value="${record.currentMoney}" maxFractionDigits="2"/>
-                                <span>/ $<fmt:formatNumber value="${record.goalMoney}" maxFractionDigits="2"/></span>
+                                ${currencySymbol}<fmt:formatNumber value="${record.currentMoney}" maxFractionDigits="2"/>
+                                <span>/ ${currencySymbol}<fmt:formatNumber value="${record.goalMoney}" maxFractionDigits="2"/></span>
                             </p>
 
                             <div class="progress-bar">
@@ -137,12 +140,12 @@
             </div>
 
             <div class="input-group" id="goalMoneyGroup">
-                <label for="goalMoneyInput">Goal Amount ($)</label>
+                <label for="goalMoneyInput">Goal Amount (${currencySymbol})</label>
                 <input type="number" id="goalMoneyInput" name="goalMoney" step="0.01" min="0.01">
             </div>
 
             <div class="input-group">
-                <label id="amountLabel" for="amountInput">Initial Amount ($)</label>
+                <label id="amountLabel" for="amountInput">Initial Amount (${currencySymbol})</label>
                 <input type="number" id="amountInput" name="currentMoney" step="0.01" value="0" required>
                 <small id="currentStatusContainer" style="display:none;">
                     Current: <span id="currentStatus"></span>
@@ -182,7 +185,7 @@
         document.getElementById('goalMoneyGroup').style.display = 'none';
         document.getElementById('goalMoneyInput').required = false;
 
-        document.getElementById('amountLabel').innerText = 'Add Amount ($)';
+        document.getElementById('amountLabel').innerText = 'Add Amount (${currencySymbol})';
         document.getElementById('amountInput').name = 'amount';
         document.getElementById('amountInput').value = '';
 
@@ -204,7 +207,7 @@
         document.getElementById('goalMoneyGroup').style.display = 'block';
         document.getElementById('goalMoneyInput').required = true;
 
-        document.getElementById('amountLabel').innerText = 'Initial Amount ($)';
+        document.getElementById('amountLabel').innerText = 'Initial Amount (${currencySymbol})';
         document.getElementById('amountInput').name = 'currentMoney';
 
         document.getElementById('currentStatusContainer').style.display = 'none';
@@ -221,6 +224,60 @@
         }
         return true;
     }
+</script>
+
+<script>
+(function () {
+    var sidebar = document.getElementById("sidebar");
+    var overlay = document.getElementById("sidebar-overlay");
+    var menuBtn = document.getElementById("menu-toggle");
+    if (!sidebar || !menuBtn) return;
+
+    function isMobile()  { return window.innerWidth <= 480; }
+    function isTablet()  { return window.innerWidth > 480 && window.innerWidth <= 768; }
+
+    function openSidebar() {
+        sidebar.classList.add("mobile-open");
+        overlay.style.cssText = "display:block;opacity:1;";
+        document.body.style.overflow = "hidden";
+    }
+    function closeSidebar() {
+        sidebar.classList.remove("mobile-open");
+        overlay.style.opacity = "0";
+        setTimeout(function(){ overlay.style.display = "none"; }, 300);
+        document.body.style.overflow = "";
+    }
+
+    menuBtn.addEventListener("click", function () {
+        if (isMobile() || isTablet()) {
+            sidebar.classList.contains("mobile-open") ? closeSidebar() : openSidebar();
+        } else {
+            sidebar.classList.toggle("hide");
+        }
+    });
+
+    overlay.addEventListener("click", closeSidebar);
+
+    sidebar.querySelectorAll(".side-menu li a").forEach(function (link) {
+        link.addEventListener("click", function () {
+            if (isMobile() || isTablet()) closeSidebar();
+        });
+    });
+
+    window.addEventListener("resize", function () {
+        if (window.innerWidth > 768) {
+            sidebar.classList.remove("mobile-open");
+            overlay.style.cssText = "display:none;opacity:0;";
+            document.body.style.overflow = "";
+        }
+    });
+
+    var touchStartX = 0;
+    sidebar.addEventListener("touchstart", function (e) { touchStartX = e.touches[0].clientX; }, { passive: true });
+    sidebar.addEventListener("touchend", function (e) {
+        if (e.changedTouches[0].clientX - touchStartX < -60 && isMobile()) closeSidebar();
+    }, { passive: true });
+})();
 </script>
 </body>
 </html>

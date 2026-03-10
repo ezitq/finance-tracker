@@ -1,5 +1,5 @@
 /* ==========================================
-   SIDEBAR
+   SIDEBAR — Mobile-first responsive
    ========================================== */
 
 #sidebar {
@@ -107,11 +107,95 @@
     justify-content: center;
 }
 
-#sidebar .side-menu.bottom li:nth-last-of-type(-n+2) {
+#sidebar .side-menu.bottom {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
+    margin-top: 0;
+    /* Safe area for notched phones */
+    padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-#sidebar .side-menu.bottom li:nth-last-of-type(2) { bottom: 40px; }
+#sidebar .side-menu.bottom li:nth-last-of-type(-n+2) {
+    position: static;
+}
+
+#sidebar .side-menu.bottom li:nth-last-of-type(2) { bottom: auto; }
+
+/* ==========================================
+   MOBILE SIDEBAR OVERLAY
+   ========================================== */
+
+/* Backdrop: hidden by default */
+#sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(2px);
+    z-index: 1999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* ==========================================
+   RESPONSIVE BREAKPOINTS
+   ========================================== */
+
+/* Tablet (768px) — collapse sidebar to icon-only by default */
+@media screen and (max-width: 768px) {
+    #sidebar {
+        width: 60px;
+    }
+
+    #sidebar .brand span,
+    #sidebar .side-menu li a span {
+        display: none;
+    }
+
+    /* When explicitly opened on tablet */
+    #sidebar.mobile-open {
+        width: 220px;
+    }
+
+    #sidebar.mobile-open .brand span,
+    #sidebar.mobile-open .side-menu li a span {
+        display: inline;
+    }
+
+    #sidebar.mobile-open ~ #sidebar-overlay {
+        display: block;
+        opacity: 1;
+    }
+}
+
+/* Phone (480px) — sidebar fully off-screen, slides in */
+@media screen and (max-width: 480px) {
+    #sidebar {
+        width: 220px;
+        transform: translateX(-100%);
+        box-shadow: none;
+    }
+
+    #sidebar .brand span,
+    #sidebar .side-menu li a span {
+        display: inline;
+    }
+
+    /* Slide in when opened */
+    #sidebar.mobile-open {
+        transform: translateX(0);
+        box-shadow: 4px 0 30px rgba(0, 243, 255, 0.15);
+    }
+
+    #sidebar.mobile-open ~ #sidebar-overlay {
+        display: block;
+        opacity: 1;
+    }
+
+    /* Hide the desktop toggle, show mobile toggle only */
+    #sidebar.hide {
+        width: 220px; /* reset the desktop-hide behaviour on mobile */
+    }
+}

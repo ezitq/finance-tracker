@@ -35,7 +35,7 @@
     border-radius: 10px;
 }
 
-.goal-header .icon.car   { color: var(--neon-pink); background: rgba(255, 0, 255, 0.1); }
+.goal-header .icon.car    { color: var(--neon-pink); background: rgba(255, 0, 255, 0.1); }
 .goal-header .icon.shield { color: var(--neon-cyan); background: rgba(0, 243, 255, 0.1); }
 
 .goal-card h3 {
@@ -79,11 +79,7 @@
     box-shadow: 0 0 10px #00ff88;
 }
 
-.goal-status {
-    font-size: 12px;
-    color: var(--text-muted);
-}
-
+.goal-status { font-size: 12px; color: var(--text-muted); }
 .goal-status.status-done { color: #00ff88; }
 
 .title-section {
@@ -92,7 +88,7 @@
     gap: 10px;
 }
 
-/* Quick delete button (shown on completed goals) */
+/* Quick delete button */
 .quick-delete-btn {
     background: var(--surface);
     border-radius: 0.5em;
@@ -109,6 +105,7 @@
     font-weight: 500;
     margin: auto;
     width: fit-content;
+    touch-action: manipulation;
 }
 
 .quick-delete-btn:hover {
@@ -117,7 +114,7 @@
     box-shadow: 0 0 15px crimson;
 }
 
-/* Dropdown context menu on goal cards */
+/* Dropdown context menu */
 .menu-wrapper {
     position: relative;
     display: inline-block;
@@ -129,7 +126,8 @@
     cursor: pointer;
     font-size: 24px;
     color: #666;
-    padding: 0;
+    padding: 4px;
+    touch-action: manipulation;
 }
 
 .menu-dropdown {
@@ -153,7 +151,7 @@
     align-items: center;
     gap: 10px;
     width: 100%;
-    padding: 10px 15px;
+    padding: 12px 15px; /* slightly taller for touch */
     text-decoration: none;
     color: #333;
     font-size: 14px;
@@ -169,3 +167,46 @@
 
 .delete-btn { color: #e74c3c; }
 .delete-btn:hover { background-color: #fff5f5; }
+
+/* ==========================================
+   RESPONSIVE BREAKPOINTS
+   ========================================== */
+
+@media screen and (max-width: 768px) {
+    .goals-grid {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+        margin-top: 16px;
+    }
+
+    .goal-card { padding: 18px; }
+}
+
+@media screen and (max-width: 480px) {
+    /* Single-column on phone */
+    .goals-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .goal-card { padding: 16px; border-radius: 12px; }
+
+    .goal-header .icon {
+        font-size: 28px;
+        padding: 8px;
+    }
+
+    .goal-card h3   { font-size: 16px; }
+    .goal-amount    { font-size: 20px; }
+
+    .quick-delete-btn {
+        padding: 0.6em 1.4em;
+        font-size: 13px;
+    }
+
+    /* Ensure dropdown doesn't overflow screen edge */
+    .menu-dropdown {
+        right: auto;
+        left: 0;
+    }
+}

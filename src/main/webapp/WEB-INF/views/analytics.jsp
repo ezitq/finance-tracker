@@ -1,3 +1,5 @@
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -12,7 +14,9 @@
     <link rel="stylesheet" href="/resources/styles/modal.css">
     <title>Neon Finance Tracker</title>
 </head>
-<body>
+<body data-currency="${not empty user.currency ? user.currency : 'USD'}">
+<c:set var="currencySymbol"><c:choose><c:when test="${user.currency.name() == 'USD'}">$</c:when><c:when test="${user.currency.name() == 'EUR'}">€</c:when><c:when test="${user.currency.name() == 'UAH'}">₴</c:when><c:otherwise>${not empty user.currency.name() ? user.currency.name() : '$'}</c:otherwise></c:choose></c:set>
+
 <section id="sidebar">
     <a href="/home-page" class="brand">
         <i class='bx bx-wallet-alt bx-sm'></i>
@@ -59,10 +63,10 @@
         </li>
     </ul>
 </section>
-
+<div id="sidebar-overlay"></div>
 <section id="content">
     <nav>
-        <i class='bx bx-menu bx-sm'></i>
+        <i class='bx bx-menu bx-sm' id='menu-toggle'></i>
         <form action="#">
             <div class="form-input">
                 <input type="search" placeholder="Search transactions...">
@@ -138,6 +142,61 @@
             }
         }
     });
+</script>
+
+
+<script>
+(function () {
+    var sidebar = document.getElementById("sidebar");
+    var overlay = document.getElementById("sidebar-overlay");
+    var menuBtn = document.getElementById("menu-toggle");
+    if (!sidebar || !menuBtn) return;
+
+    function isMobile()  { return window.innerWidth <= 480; }
+    function isTablet()  { return window.innerWidth > 480 && window.innerWidth <= 768; }
+
+    function openSidebar() {
+        sidebar.classList.add("mobile-open");
+        overlay.style.cssText = "display:block;opacity:1;";
+        document.body.style.overflow = "hidden";
+    }
+    function closeSidebar() {
+        sidebar.classList.remove("mobile-open");
+        overlay.style.opacity = "0";
+        setTimeout(function(){ overlay.style.display = "none"; }, 300);
+        document.body.style.overflow = "";
+    }
+
+    menuBtn.addEventListener("click", function () {
+        if (isMobile() || isTablet()) {
+            sidebar.classList.contains("mobile-open") ? closeSidebar() : openSidebar();
+        } else {
+            sidebar.classList.toggle("hide");
+        }
+    });
+
+    overlay.addEventListener("click", closeSidebar);
+
+    sidebar.querySelectorAll(".side-menu li a").forEach(function (link) {
+        link.addEventListener("click", function () {
+            if (isMobile() || isTablet()) closeSidebar();
+        });
+    });
+
+    window.addEventListener("resize", function () {
+        if (window.innerWidth > 768) {
+            sidebar.classList.remove("mobile-open");
+            overlay.style.cssText = "display:none;opacity:0;";
+            document.body.style.overflow = "";
+        }
+    });
+
+    var touchStartX = 0;
+    sidebar.addEventListener("touchstart", function (e) { touchStartX = e.touches[0].clientX; }, { passive: true });
+    sidebar.addEventListener("touchend", function (e) {
+        if (e.changedTouches[0].clientX - touchStartX < -60 && isMobile()) closeSidebar();
+    }, { passive: true });
+})();
 </script>
 </body>
 </html>

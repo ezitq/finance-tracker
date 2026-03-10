@@ -1,0 +1,251 @@
+/* ==========================================
+   CURRENCY THEMES
+   Клас ставиться на <body> через currency-theme.js
+   ========================================== */
+
+/* ── USD (default) — Cyan ── */
+body[data-currency="USD"],
+body.currency-USD {
+    --neon-accent:        #00f3ff;
+    --neon-accent-rgb:    0, 243, 255;
+    --neon-income:        #00ff66;
+    --neon-income-rgb:    0, 255, 102;
+    --currency-symbol:    "$";
+    --currency-label:     "USD";
+}
+
+/* ── EUR — Purple ── */
+body[data-currency="EUR"],
+body.currency-EUR {
+    --neon-accent:        #bc13fe;
+    --neon-accent-rgb:    188, 19, 254;
+    --neon-income:        #00ffcc;
+    --neon-income-rgb:    0, 255, 204;
+    --currency-symbol:    "€";
+    --currency-label:     "EUR";
+}
+
+/* ── UAH — Amber/Gold ── */
+body[data-currency="UAH"],
+body.currency-UAH {
+    --neon-accent:        #ffaa00;
+    --neon-accent-rgb:    255, 170, 0;
+    --neon-income:        #00ff66;
+    --neon-income-rgb:    0, 255, 102;
+    --currency-symbol:    "₴";
+    --currency-label:     "UAH";
+}
+
+/* ── GBP — Green ── */
+body[data-currency="GBP"],
+body.currency-GBP {
+    --neon-accent:        #39ff14;
+    --neon-accent-rgb:    57, 255, 20;
+    --neon-income:        #00f3ff;
+    --neon-income-rgb:    0, 243, 255;
+    --currency-symbol:    "£";
+    --currency-label:     "GBP";
+}
+
+/* ── PLN — Orange ── */
+body[data-currency="PLN"],
+body.currency-PLN {
+    --neon-accent:        #ff6600;
+    --neon-accent-rgb:    255, 102, 0;
+    --neon-income:        #00ff66;
+    --neon-income-rgb:    0, 255, 102;
+    --currency-symbol:    "zł";
+    --currency-label:     "PLN";
+}
+
+/* ── CHF — Blue ── */
+body[data-currency="CHF"],
+body.currency-CHF {
+    --neon-accent:        #4d9fff;
+    --neon-accent-rgb:    77, 159, 255;
+    --neon-income:        #00ffcc;
+    --neon-income-rgb:    0, 255, 204;
+    --currency-symbol:    "₣";
+    --currency-label:     "CHF";
+}
+
+/* ==========================================
+   OVERRIDE ВСІХ CYAN-ПОСИЛАНЬ НА --neon-accent
+   (щоб тема реально застосовувалась скрізь)
+   ========================================== */
+
+/* Sidebar активний елемент */
+#sidebar .side-menu.top li.active a {
+    color: var(--neon-accent);
+    text-shadow: 0 0 8px var(--neon-accent);
+}
+
+/* Brand / logo */
+#sidebar .brand {
+    color: var(--neon-accent);
+    text-shadow: 0 0 10px rgba(var(--neon-accent-rgb), 0.5);
+}
+
+/* Navbar search button */
+#content nav form .form-input button {
+    background: var(--neon-accent);
+    box-shadow: 0 0 10px rgba(var(--neon-accent-rgb), 0.3);
+}
+
+/* Profile avatar border */
+#content nav .profile img {
+    border-color: var(--neon-accent);
+}
+
+/* Active breadcrumb */
+#content main .head-title .left .breadcrumb li a.active {
+    color: var(--neon-accent);
+    text-shadow: 0 0 5px var(--neon-accent);
+}
+
+/* Add Transaction / Download button */
+#content main .head-title .btn-download {
+    border-color: var(--neon-accent);
+    color: var(--neon-accent);
+    box-shadow: inset 0 0 5px rgba(var(--neon-accent-rgb), 0.2),
+                0 0 10px rgba(var(--neon-accent-rgb), 0.2);
+}
+#content main .head-title .btn-download:hover {
+    background: var(--neon-accent);
+    color: #000;
+    box-shadow: 0 0 15px var(--neon-accent);
+}
+
+/* Stat cards */
+#content main .box-info li:nth-child(1) .bx {
+    background: rgba(var(--neon-accent-rgb), 0.1);
+    color: var(--neon-accent);
+    box-shadow: 0 0 15px rgba(var(--neon-accent-rgb), 0.2);
+    border-color: rgba(var(--neon-accent-rgb), 0.3);
+}
+#content main .box-info li:nth-child(2) .bx {
+    background: rgba(var(--neon-income-rgb), 0.1);
+    color: var(--neon-income);
+    box-shadow: 0 0 15px rgba(var(--neon-income-rgb), 0.2);
+    border-color: rgba(var(--neon-income-rgb), 0.3);
+}
+
+/* Income status text */
+#content main .table-data .order table tr td .status.income {
+    color: var(--neon-income);
+    text-shadow: 0 0 5px rgba(var(--neon-income-rgb), 0.5);
+}
+
+/* Goal card hover */
+.goal-card:hover {
+    border-color: var(--neon-accent);
+    box-shadow: 0 0 15px rgba(var(--neon-accent-rgb), 0.1);
+}
+
+/* Progress bar */
+.progress {
+    background: var(--neon-accent);
+    box-shadow: 0 0 10px var(--neon-accent);
+}
+
+/* Modal border */
+.modal-content {
+    border-color: var(--neon-accent);
+    box-shadow: 0 0 20px rgba(var(--neon-accent-rgb), 0.2);
+}
+
+/* Modal inputs focus */
+.input-group input:focus,
+.input-group select:focus {
+    border-color: var(--neon-accent);
+    box-shadow: 0 0 8px rgba(var(--neon-accent-rgb), 0.3);
+}
+
+/* Submit button */
+.submit-btn {
+    background: rgba(var(--neon-accent-rgb), 0.1);
+    color: var(--neon-accent);
+    border-color: var(--neon-accent);
+}
+.submit-btn:hover {
+    background: var(--neon-accent);
+    color: #000;
+    box-shadow: 0 0 15px var(--neon-accent);
+}
+
+/* Sidebar border */
+#sidebar {
+    border-right-color: rgba(var(--neon-accent-rgb), 0.1);
+}
+
+/* Goals not-completed left border */
+#content main .table-data .todo .todo-list li.not-completed {
+    border-left-color: var(--neon-accent);
+    box-shadow: inset 5px 0 10px rgba(var(--neon-accent-rgb), 0.1);
+}
+
+/* Profile avatar border */
+.profile-avatar {
+    border-color: var(--neon-accent);
+    box-shadow: 0 0 15px rgba(var(--neon-accent-rgb), 0.3);
+}
+
+/* btn-outline */
+.btn-outline {
+    border-color: var(--neon-accent);
+    color: var(--neon-accent);
+}
+.btn-outline:hover {
+    background: var(--neon-accent);
+    color: #000;
+}
+
+/* Date filter focus */
+.date-filter:focus {
+    border-color: var(--neon-accent);
+    box-shadow: 0 0 8px rgba(var(--neon-accent-rgb), 0.3);
+}
+
+/* Action edit button */
+.action-btn.edit { color: var(--neon-accent); }
+.action-btn.edit:hover { text-shadow: 0 0 5px var(--neon-accent); }
+
+/* Analytics — Chart.js canvas wrapper accent line */
+.chart-accent { border-color: var(--neon-accent); }
+
+/* ==========================================
+   CURRENCY SYMBOL BADGE (navbar / sidebar)
+   Показує поточну валюту у навбарі
+   ========================================== */
+.currency-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(var(--neon-accent-rgb), 0.12);
+    border: 1px solid rgba(var(--neon-accent-rgb), 0.35);
+    color: var(--neon-accent);
+    text-shadow: 0 0 6px rgba(var(--neon-accent-rgb), 0.6);
+    box-shadow: 0 0 8px rgba(var(--neon-accent-rgb), 0.15);
+    letter-spacing: 0;
+    flex-shrink: 0;
+    transition: background 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.3s;
+}
+
+/* ==========================================
+   TRANSITION — плавна зміна теми
+   ========================================== */
+*, *::before, *::after {
+    transition-property: color, background-color, border-color, box-shadow, text-shadow;
+    transition-duration: 0.35s;
+    transition-timing-function: ease;
+}
+
+/* Але не чіпаємо transform-анімації */
+.goal-card, #content main .box-info li, .modal-content {
+    transition: transform 0.3s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+}

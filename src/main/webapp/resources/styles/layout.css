@@ -111,8 +111,8 @@
     width: 100%;
     padding: 36px 24px;
     font-family: var(--poppins);
-    max-height: calc(100vh - 56px);
-    overflow-y: auto;
+    /* Allow natural document scrolling on desktop too */
+    min-height: calc(100vh - 56px);
 }
 
 #content main .head-title {
@@ -170,8 +170,76 @@
     box-shadow: 0 0 15px var(--neon-cyan);
 }
 
-/* Responsive */
+/* ==========================================
+   RESPONSIVE BREAKPOINTS
+   ========================================== */
+
+/* Tablet — sidebar collapses to 60px icons */
 @media screen and (max-width: 768px) {
-    #sidebar { width: 200px; }
-    #content { width: calc(100% - 60px); left: 200px; }
+    #content {
+        width: calc(100% - 60px);
+        left: 60px;
+    }
+
+    /* When sidebar is open on tablet, push content */
+    #sidebar.mobile-open ~ #content {
+        width: calc(100% - 220px);
+        left: 220px;
+    }
+
+    #content main {
+        padding: 24px 16px;
+    }
+
+    #content main .head-title .left h1 {
+        font-size: 28px;
+    }
+}
+
+/* Phone — sidebar is off-screen, content takes full width */
+@media screen and (max-width: 480px) {
+    #content {
+        width: 100%;
+        left: 0;
+    }
+
+    /* Even when sidebar opens, content stays full-width (overlay pattern) */
+    #sidebar.mobile-open ~ #content {
+        width: 100%;
+        left: 0;
+    }
+
+    #content nav {
+        padding: 0 16px;
+        grid-gap: 12px;
+    }
+
+    /* Hide search bar on very small screens, keep icon */
+    #content nav form {
+        display: none;
+    }
+
+    #content main {
+        padding: 20px 14px;
+        /* Use min-height instead of max-height so long pages can scroll */
+        max-height: none;
+        min-height: calc(100vh - 56px);
+        /* Safe area bottom padding for notched phones */
+        padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
+    }
+
+    #content main .head-title .left h1 {
+        font-size: 22px;
+        margin-bottom: 6px;
+    }
+
+    #content main .head-title .btn-download span {
+        display: none; /* icon only on mobile */
+    }
+
+    #content main .head-title .btn-download {
+        width: 36px;
+        padding: 0;
+        justify-content: center;
+    }
 }
